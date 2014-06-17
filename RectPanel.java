@@ -1,3 +1,6 @@
+/**
+* This class is an object which creates a visual of a board and adds itself to board's JFrame
+*/
 import java.awt.Color;
 import java.awt.*;
 import javax.swing.*;
@@ -5,12 +8,17 @@ public class RectPanel extends JPanel {
    int c, r;
    Board gameBoard;
    boolean notLost = true;
+/**
+* creates it with the number of collums (c) and the number of rows (r)
+*/
    public RectPanel(int c, int r, Board gameBoard) {
       this.gameBoard = gameBoard;
       this.c = c;
       this.r = r;
    }
-   
+/**
+* Draws EVERYTHING
+*/
    public void paintComponent(Graphics g) {
       super.paintComponent(g);
       for (int cR = 0; cR < r; cR++) {
@@ -25,11 +33,8 @@ public class RectPanel extends JPanel {
             if (gameBoard.getBoard()[cC][cR].getRevealed()) {
                g.fillRect(cC * 21 + 1, cR * 21 + 1, 20, 20);
             }
-//             if (gameBoard.getBoard()[cC][cR].getIsMine()) {
-//                System.out.println(cC + "," + cR);
-//             }
             if (gameBoard.getBoard()[cC][cR].getRevealed()) {
-               if (gameBoard.getBoard()[cC][cR].getValue() != 0) {
+               if (gameBoard.getBoard()[cC][cR].getValue() != 0 && gameBoard.getBoard()[cC][cR].getValue() != 9) {
                   g.setFont(new Font("Courier", Font.BOLD, 20));
                   if (gameBoard.getBoard()[cC][cR].getValue() == 1) {
                      g.setColor(Color.BLUE);
@@ -55,32 +60,24 @@ public class RectPanel extends JPanel {
                   if (gameBoard.getBoard()[cC][cR].getValue() == 8) {
                      g.setColor(Color.DARK_GRAY);
                   }
-                  if (gameBoard.getBoard()[cC][cR].isMarked()) {
-                     g.setColor(Color.DARK_GRAY);
-                     g.fillOval(cC * 21, cR * 21, 21, 21);
-                     g.setColor(Color.RED);
-                     g.drawLine(cC * 21 + 1, cR * 21 + 1, cC * 21 + 20, cR * 21 + 20);
-                     g.drawLine(cC * 21 + 1, cR * 21 + 20, cC * 21 + 20, cR * 21 + 1);
-
-                     g.drawLine(cC * 21 + 1, cR * 21 + 2, cC * 21 + 19, cR * 21 + 20);
-                     g.drawLine(cC * 21 + 1, cR * 21 + 19, cC * 21 + 19, cR * 21 + 1);
-
-                     g.drawLine(cC * 21 + 2, cR * 21 + 1, cC * 21 + 20, cR * 21 + 19);
-                     g.drawLine(cC * 21 + 2, cR * 21 + 20, cC * 21 + 20, cR * 21 + 2);
-
-                     g.drawLine(cC * 21 + 1, cR * 21 + 3, cC * 21 + 18, cR * 21 + 20);
-                     g.drawLine(cC * 21 + 1, cR * 21 + 18, cC * 21 + 18, cR * 21 + 1);
-
-                     g.drawLine(cC * 21 + 3, cR * 21 + 1, cC * 21 + 20, cR * 21 + 18);
-                     g.drawLine(cC * 21 + 3, cR * 21 + 20, cC * 21 + 20, cR * 21 + 3);
-                  } else {                  
+                  if (!gameBoard.getBoard()[cC][cR].isMarked()) {
                      g.drawString("" + gameBoard.getBoard()[cC][cR].getValue(), cC * 21 + 5, cR * 21 + 17);
                   }
                }
-               if (gameBoard.getBoard()[cC][cR].getIsMine()) {
+            }
+            if ((gameBoard.getBoard()[cC][cR].isMarked() && notLost && !gameBoard.getWon()) || (gameBoard.getBoard()[cC][cR].isMarked() && gameBoard.getBoard()[cC][cR].getIsMine() && !gameBoard.getWon())) {
+               g.setColor(Color.RED);
+               g.fillRect(cC * 21 + 1, cR * 21 + 1, 20, 20);
+               g.setColor(Color.BLACK);
+               g.drawLine(cC * 21 + 8, cR * 21 + 6, cC * 21 + 18, cR * 21 + 9);
+               g.drawLine(cC * 21 + 8, cR * 21 + 12, cC * 21 + 18, cR * 21 + 9);
+               g.drawLine(cC * 21 + 8, cR * 21 + 6, cC * 21 + 8, cR * 21 + 19);
+            }
+            if (gameBoard.getBoard()[cC][cR].getIsMine() && !gameBoard.getBoard()[cC][cR].isMarked()) {
+               if (gameBoard.getBoard()[cC][cR].getRevealed()) {
                   g.setColor(Color.DARK_GRAY);
                   g.fillOval(cC * 21, cR * 21, 21, 21);
-                  if (gameBoard.getBoard()[cC][cR].isMarked()) {
+                  if (gameBoard.getBoard()[cC][cR].isMarked() && gameBoard.getWon()) {
                      g.setColor(Color.RED);
                      g.drawOval(cC * 21, cR * 21, 21, 21);
                      g.drawOval(cC * 21 + 3, cR * 21 + 3, 15, 15);
@@ -89,26 +86,36 @@ public class RectPanel extends JPanel {
                   }
                }
             }
-            if (gameBoard.getBoard()[cC][cR].isMarked() && notLost) {
+            if ((gameBoard.getBoard()[cC][cR].isMarked() && !notLost && !gameBoard.getBoard()[cC][cR].getIsMine())){
+               g.setColor(Color.DARK_GRAY);
+               g.fillOval(cC * 21, cR * 21, 21, 21);
                g.setColor(Color.RED);
-               g.fillRect(cC * 21 + 1, cR * 21 + 1, 20, 20);
-               g.setColor(Color.BLACK);
-               g.drawLine(cC * 21 + 8, cR * 21 + 6, cC * 21 + 18, cR * 21 + 9);
-               g.drawLine(cC * 21 + 8, cR * 21 + 12, cC * 21 + 18, cR * 21 + 9);
-               g.drawLine(cC * 21 + 8, cR * 21 + 6, cC * 21 + 8, cR * 21 + 19);
+               g.drawLine(cC * 21 + 1, cR * 21 + 1, cC * 21 + 20, cR * 21 + 20);
+               g.drawLine(cC * 21 + 1, cR * 21 + 20, cC * 21 + 20, cR * 21 + 1);
+
+               g.drawLine(cC * 21 + 1, cR * 21 + 2, cC * 21 + 19, cR * 21 + 20);
+               g.drawLine(cC * 21 + 1, cR * 21 + 19, cC * 21 + 19, cR * 21 + 1);
+
+               g.drawLine(cC * 21 + 2, cR * 21 + 1, cC * 21 + 20, cR * 21 + 19);
+               g.drawLine(cC * 21 + 2, cR * 21 + 20, cC * 21 + 20, cR * 21 + 2);
+
+               g.drawLine(cC * 21 + 1, cR * 21 + 3, cC * 21 + 18, cR * 21 + 20);
+               g.drawLine(cC * 21 + 1, cR * 21 + 18, cC * 21 + 18, cR * 21 + 1);
+
+               g.drawLine(cC * 21 + 3, cR * 21 + 1, cC * 21 + 20, cR * 21 + 18);
+               g.drawLine(cC * 21 + 3, cR * 21 + 20, cC * 21 + 20, cR * 21 + 3);
             }
          }
       }
       g.setFont(new Font("SansSerif", Font.BOLD, 10));
       g.setColor(Color.BLACK);
       g.drawString("Left click to reveal a tile", 1, r * 21 + 15);
-      g.drawString("Right click to mark a mine", 1, r * 21 + 30);   
+      g.drawString("Right click to mark a mine", 1, r * 21 + 30);
    }
-
+/**
+* changes if the player has lost to know what to draw
+*/
    public void setLost() {
       notLost = false;
    }
-//    public void changeBoard(Board gameBoard) {
-//       this.gameBoard = gameBoard;
-//    }
 }

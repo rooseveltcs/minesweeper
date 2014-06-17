@@ -1,6 +1,12 @@
+/**
+* This is the most important part including an array of squares
+* which represent the board and alot of the info and methods used for showing
+* and changing the board
+*/
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
+import org.joda.time.*;
 public class Board extends JPanel {
    private int height;
    private int width;
@@ -8,9 +14,15 @@ public class Board extends JPanel {
    private int unmarked;
    private Square[][] board;
    boolean notLost = true;
+   private boolean won = false;
+   JButton button = new JButton();
    JFrame frame = new JFrame();
-   
+   int secStart;
+/**
+* sets the board to prepare for the game to start
+*/
    public Board(int height, int width, int mines) {
+      secStart = DateTime.now().millisOfDay().get();
       this.height = height;
       this.width = width;
       this.mines = mines;
@@ -22,7 +34,9 @@ public class Board extends JPanel {
          }
       }
    }
-   
+/**
+* Replaces random spaces with mines and sets values to the rest of the spaces
+*/
    public void setBoard() {
       int tempMines = mines;
       while (tempMines > 0) {
@@ -82,26 +96,57 @@ public class Board extends JPanel {
          }
       }
    }
-   
+/**
+* returns the board
+*/
    public Square[][] getBoard() {
       return board;
    }
-   
+/**
+* changes the variable that tells if one has won
+*/
+   public void setWon() {
+      won = true;
+   }
+/**
+* tells whether one has won
+*/
+   public boolean getWon() {
+      return won;
+   }
+/**
+* returns how tall the board is
+*/
    public int getHeight() {
       return height;
    }
-   
+/**
+* returns how long the board is
+*/
    public int getWidth() {
       return width;
    }
+/**
+* returns how many mines are on the board
+*/
    public int getMines() {
       return mines;
    }
-   
+/**
+* returns the time that the game started
+*/
+   public int getStart() {
+      return secStart;
+   }
+/**
+* sets the square at that location as marked or unmarked
+*/
    public void mark(int x, int y) {
       board[x][y].mark();
    }
-   
+/**
+* reveals the square and if there are no adjasent mines, all the adjasent spaces
+*/
    public void reveal(int x, int y) {
       board[x][y].reveal();
       if (board[x][y].getValue() == 0) {
@@ -136,7 +181,9 @@ public class Board extends JPanel {
          notLost = true;
       }
    }
-   
+/**
+* Sets up and shows the frame
+*/
    public void show(Board gameBoard) {
       frame.setForeground(Color.LIGHT_GRAY);
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -145,20 +192,25 @@ public class Board extends JPanel {
       Graphics g = frame.getGraphics();
       RectPanel blah = new RectPanel(width, height, gameBoard);
       blah.addMouseListener(new ButtonClicker(gameBoard));
-//       blah.addMouseListener(new ButtonClicker());
       frame.add(blah);
       frame.setVisible(true);
    }
-   
+/**
+* updates the frame
+*/
    public void addToFrame(RectPanel blah) {
       frame.add(blah);
       frame.setVisible(true);
    }
-   
+/**
+* says if the player hasn't lost
+*/
    public boolean getLost() {
       return notLost;
    }
-   
+/**
+* sets if the player hasn't not lost and shows the board
+*/
    public void setLost() {
       notLost = false;
       for (int w = 0; w < width; w++) {
